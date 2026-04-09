@@ -12,7 +12,7 @@ from classification.risk_engine import calculate_risk
 from utils.helper import mask, timestamp
 from utils.alert import send_alert
 
-import requests
+
 
 
 # 🔹 Process text
