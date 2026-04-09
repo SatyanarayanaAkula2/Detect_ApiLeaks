@@ -2,6 +2,7 @@ from fastapi import FastAPI,UploadFile,File
 from source import scan_specific_repo, run_global_scan,scan_file_content,scan_text_input
 from fastapi.middleware.cors  import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 
 class TextScanRequest(BaseModel):
     text:str
@@ -25,16 +26,19 @@ async def scan_text(data:TextScanRequest):
     try:
         results,error=scan_text_input(data.text)
         if error:
-            return {"error":error}
-        return {"results": results,
+            return JSONResponse(content={
+                    "results":[],
+                    "error": error})
+        
+        return JSONResponse(content={"results": results,
                     "error":None
-                    }
+                    })
     except Exception as e:
         print("error:",str(e))
-        return{
+        return JSONResponse(content={
             "results":[],
             "error":str(e)
-        }
+        })
 
 @app.post("/scan/file")
 async def scan_file(file: UploadFile = File(...)):
@@ -44,16 +48,16 @@ async def scan_file(file: UploadFile = File(...)):
         results, error = scan_file_content(content, file.filename)
 
         if error:
-            return {
+            return JSONResponse(content={
                 "results":[],
-                "error": error}
+                "error": error})
 
-        return {"results": results,
-                "error":None}
+        return JSONResponse(content={"results": results,
+                "error":None})
 
     except Exception as e:
-        return {"results":[],
-            "error": str(e)}
+        return JSONResponse(content={"results":[],
+            "error": str(e)})
 
 @app.post("/scan/repo")
 async def scan_repo(data: dict):
@@ -63,20 +67,20 @@ async def scan_repo(data: dict):
         results, error = scan_specific_repo(repo_url)
 
         if error:
-            return {
+            return JSONResponse(content={
                     "results":[],
-                    "error": error}
+                    "error": error})
 
-        return {"results": results,
+        return JSONResponse(content={"results": results,
                     "error":None
-                    }
+                    })
 
     except Exception as e:
         print("error:",str(e))
-        return{
+        return JSONResponse(content={
             "results":[],
             "error":str(e)
-        }
+        })
 
 
 @app.post("/scan/global")
@@ -87,13 +91,13 @@ async def scan_global(data: dict):
         results, error = run_global_scan(limit)
 
         if error:
-            return {"error": error}
+            return JSONResponse(content= { "results":[],"error": error})
 
-        return {"results": results,
+        return JSONResponse(content={"results": results,
                 "error":None
-                }
+                })
 
     except Exception as e:
         print("ERROR:", e)   # 🔥 shows real issue in terminal
-        return {"results":[],
-            "error": str(e)}
+        return JSONResponse(content={"results":[],
+            "error": str(e)})
