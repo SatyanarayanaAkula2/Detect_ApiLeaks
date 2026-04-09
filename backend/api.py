@@ -21,16 +21,23 @@ def home():
 
 
 @app.post("/scan/text")
-def scan_text(data:TextScanRequest):
-    results,error=scan_text_input(data.text)
-    if error:
-        return {"error":error}
-    return {"results": results,
-                "error":None
-                }
+async def scan_text(data:TextScanRequest):
+    try:
+        results,error=scan_text_input(data.text)
+        if error:
+            return {"error":error}
+        return {"results": results,
+                    "error":None
+                    }
+    except Exception as e:
+        print("error:",str(e))
+        return{
+            "results":[],
+            "error":str(e)
+        }
 
 @app.post("/scan/file")
-def scan_file(file: UploadFile = File(...)):
+async def scan_file(file: UploadFile = File(...)):
     try:
         content = file.file.read().decode("utf-8", errors="ignore")
 
@@ -45,26 +52,35 @@ def scan_file(file: UploadFile = File(...)):
                 "error":None}
 
     except Exception as e:
-        return {"error": str(e)}
+        return {"results":[],
+            "error": str(e)}
 
 @app.post("/scan/repo")
-def scan_repo(data: dict):
-    repo_url = data.get("repo_url")
+async def scan_repo(data: dict):
+    try:
+        repo_url = data.get("repo_url")
 
-    results, error = scan_specific_repo(repo_url)
+        results, error = scan_specific_repo(repo_url)
 
-    if error:
-        return {
-                "results":[],
-                "error": error}
+        if error:
+            return {
+                    "results":[],
+                    "error": error}
 
-    return {"results": results,
-                "error":None
-                }
+        return {"results": results,
+                    "error":None
+                    }
+
+    except Exception as e:
+        print("error:",str(e))
+        return{
+            "results":[],
+            "error":str(e)
+        }
 
 
 @app.post("/scan/global")
-def scan_global(data: dict):
+async def scan_global(data: dict):
     try:
         limit = int(data.get("limit", 20))
 
@@ -79,4 +95,5 @@ def scan_global(data: dict):
 
     except Exception as e:
         print("ERROR:", e)   # 🔥 shows real issue in terminal
-        return {"error": str(e)}
+        return {"results":[],
+            "error": str(e)}
