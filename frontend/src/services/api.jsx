@@ -11,9 +11,11 @@ export const scanText = async (text) => {
     body: JSON.stringify({ text }),
   });
   console.log("response status",res.status);
-  const data=await res.text()
-  if(!data) throw new Error("Empty response froms server");
-  return JSON.parse(data);
+  if(!res.ok){
+    throw new Error("server error");
+  }
+  const data=await res.json()
+  return data;
 };
 
 // FILE SCAN
@@ -27,9 +29,11 @@ export const scanFile = async (file) => {
     body: formData,
   });
   console.log("response status",res.status);
-  const data=await res.text()
-  if(!data) throw new Error("Empty response froms server");
-  return JSON.parse(data);
+  if(!res.ok){
+    throw new Error("server error");
+  }
+  const data=await res.json()
+  return data;
 };
 
 // REPO SCAN
@@ -44,10 +48,11 @@ export const scanRepo = async (repo_url) => {
     body: JSON.stringify({ repo_url }),
   });
   console.log("response status",res.status);
-  if(!res.ok) throw new Error("Server Error");
-  const data=await res.text()
-  if(!data) throw new Error("Empty response froms server");
-  return JSON.parse(data);
+  if(!res.ok){
+    throw new Error("server error");
+  }
+  const data=await res.json()
+  return data;
   
   }
   catch(err){
@@ -68,7 +73,9 @@ export const scanGlobal = async (limit = 10) => {
   });
   console.log("response status",res.status);
 
-  const data=await res.text()
-  if(!data) throw new Error("Empty response froms server");
-  return JSON.parse(data);
+  if(!res.ok){
+    throw new Error("server error");
+  }
+  const data=await res.json()
+  return data;
 };
